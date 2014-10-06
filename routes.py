@@ -1,3 +1,5 @@
+
+from flask import flash
 from flask import Flask
 from flask import redirect
 from flask import render_template
@@ -43,7 +45,11 @@ def internal_server_error(e):
 def tickets():
     form = NameForm()
     if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('Looks like you have change your name!')
         session['name'] = form.name.data
+        form.name.data = ''
         return redirect(url_for('tickets'))
     return render_template(
         'tickets.html',
