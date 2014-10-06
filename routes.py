@@ -1,5 +1,8 @@
 from flask import Flask
+from flask import redirect
 from flask import render_template
+from flask import session
+from flask import url_for
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form
 from wtforms import StringField
@@ -38,12 +41,14 @@ def internal_server_error(e):
 
 @app.route('/tickets', methods=['GET', 'POST'])
 def tickets():
-    name = None
     form = NameForm()
     if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ''
-    return render_template('tickets.html', form=form, name=name)
+        session['name'] = form.name.data
+        return redirect(url_for('tickets'))
+    return render_template(
+        'tickets.html',
+        form=form,
+        name=session.get('name'))
 
 
 class NameForm(Form):
